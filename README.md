@@ -24,19 +24,6 @@ An interactive web application that displays various points  around Austin, Texa
 - **Leaflet.js** - Open-source JavaScript library for interactive maps
 - **OpenStreetMap** - Free, open-source map data
 
-## Project Structure 
-
-austin-map-app/
-├── main.go # Main application entry point
-├── handlers/
-│ └── locations.go # Location data and API handlers
-├── models/
-│ └── location.go # Location data structure
-└── static/
-├── index.html # Frontend interface
-└── style.css # CSS styling
-
-
 ## Getting Started
 
 1. Clone the repository
