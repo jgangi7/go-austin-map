@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Austin Interactive Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>Austin, TX</h1>
+            <div id="location-list"></div>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        let map;
+        let markers = [];
+        let locations = [];
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([30.2672, -97.7431], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Load locations from API
+        async function loadLocations() {
+            const response = await fetch('/api/locations');
+            locations = await response.json();
+            displayLocations();
+        }
+
+        // Display locations on map and in sidebar
+        function displayLocations(category = 'all') {
+            // Clear existing markers
+            markers.forEach(marker => map.removeMarker(marker));
+            markers = [];
+
+            // Clear location list
+            const locationList = document.getElementById('location-list');
+            locationList.innerHTML = '';
+
+            // Filter locations
+            const filteredLocations = category === 'all' 
+                ? locations 
+                : locations.filter(loc => loc.category === category);
+
+            // Add locations to map and list
+            filteredLocations.forEach(location => {
+                // Add marker to map
+                const marker = L.marker([location.latitude, location.longitude])
+                    .bindPopup(`<b>${location.name}</b><br>${location.description}`)
+                    .addTo(map);
+                markers.push(marker);
+
+                // Add to sidebar list
+                const locationElement = document.createElement('div');
+                locationElement.className = 'location-item';
+                locationElement.innerHTML = `
+                    <h3>${location.name}</h3>
+                    <p>${location.description}</p>
+                `;
+                locationElement.addEventListener('click', () => {
+                    map.setView([location.latitude, location.longitude], 15);
+                    marker.openPopup();
+                });
+                locationList.appendChild(locationElement);
+            });
+        }
+
+
+        // Initialize
+        initMap();
+        loadLocations();
+    </script>
+</body>
+</html>
